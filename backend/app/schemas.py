@@ -44,6 +44,7 @@ class UserResponse(BaseModel):
     email: str
     role: str
     telegram_chat_id: Optional[str] = None
+    telegram_username: Optional[str] = None
     is_active: bool
     created_at: datetime
 

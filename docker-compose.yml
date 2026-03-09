@@ -38,5 +38,17 @@ services:
     depends_on:
       - backend
 
+  telegram_bot:
+    build: ./telegram_bot
+    restart: unless-stopped
+    environment:
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-6536016874:AAHP3iZIqHgD7ls-nzscCe90isXsxgIKpe4}
+      API_BASE_URL: http://backend:8000
+    volumes:
+      - bot_data:/app/bot_data
+    depends_on:
+      - backend
+
 volumes:
   mongo_data:
+  bot_data:
