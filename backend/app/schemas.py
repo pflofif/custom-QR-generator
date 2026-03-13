@@ -84,6 +84,25 @@ class EventResponse(BaseModel):
 
 # ─── QR Code ──────────────────────────────────────────────────────────────────
 
+class QRCustomStyle(BaseModel):
+    colorized: bool = False
+    contrast: float = 1.0
+    brightness: float = 1.0
+    version: int = 1
+    level: str = "H"
+    has_background: bool = False
+    background_key: Optional[str] = None
+    rendered_image_key: Optional[str] = None
+
+
+class QRStyleRequest(BaseModel):
+    colorized: bool = False
+    contrast: float = Field(1.0, ge=0.1, le=3.0)
+    brightness: float = Field(1.0, ge=0.1, le=3.0)
+    version: int = Field(1, ge=1, le=40)
+    level: str = Field("H", pattern="^[LMQH]$")
+
+
 class QRCreateRequest(BaseModel):
     label: str = Field(..., min_length=1, max_length=100)
     target_url: str = Field(..., min_length=5)
@@ -107,6 +126,7 @@ class QRResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
     scan_count: Optional[int] = 0
+    custom_style: Optional[QRCustomStyle] = None
 
 
 # ─── Analytics ────────────────────────────────────────────────────────────────

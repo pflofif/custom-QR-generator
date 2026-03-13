@@ -5,10 +5,11 @@ import Link from "next/link";
 import api from "@/lib/api";
 import toast from "react-hot-toast";
 import Modal from "@/components/Modal";
+import CustomizeQRModal from "@/components/CustomizeQRModal";
 import { Event, QRCode, QRCreatePayload, QRUpdatePayload } from "@/types";
 import {
   ArrowLeft, BarChart3, Plus, QrCode, Pencil, Trash2,
-  ToggleLeft, ToggleRight, Copy, ExternalLink, Download,
+  ToggleLeft, ToggleRight, Copy, ExternalLink, Download, Sparkles,
 } from "lucide-react";
 import { formatDate, cn } from "@/lib/utils";
 
@@ -24,6 +25,7 @@ export default function EventDetailPage() {
   const [editQR, setEditQR] = useState<QRCode | null>(null);
   const [editEvent, setEditEvent] = useState(false);
   const [qrImageModal, setQrImageModal] = useState<QRCode | null>(null);
+  const [customizeQR, setCustomizeQR] = useState<QRCode | null>(null);
 
   // forms
   const [createForm, setCreateForm] = useState<QRCreatePayload>({ label: "", target_url: "" });
@@ -125,10 +127,12 @@ export default function EventDetailPage() {
   const downloadQR = async (qr: QRCode) => {
     try {
       const res = await api.get(`/api/events/${id}/qrcodes/${qr.id}/image`, { responseType: "blob" });
+      const contentType: string = res.headers["content-type"] ?? "";
+      const ext = contentType.includes("gif") ? "gif" : "png";
       const url = URL.createObjectURL(res.data);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${qr.label.replace(/\s+/g, "_")}_qr.png`;
+      a.download = `${qr.label.replace(/\s+/g, "_")}_qr.${ext}`;
       a.click();
       URL.revokeObjectURL(url);
     } catch {
@@ -209,6 +213,11 @@ export default function EventDetailPage() {
                       {qr.is_active ? "Active" : "Inactive"}
                     </span>
                     <span className="badge-blue">{qr.scan_count} scans</span>
+                    {qr.custom_style && (
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-violet-100 text-violet-700">
+                        <Sparkles className="w-3 h-3" /> Custom
+                      </span>
+                    )}
                   </div>
 
                   {/* Destination URL */}
@@ -246,6 +255,14 @@ export default function EventDetailPage() {
                     title="Download QR Image"
                   >
                     <Download className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setCustomizeQR(qr)}
+                    className="w-8 h-8 flex items-center justify-center rounded-lg transition-colors"
+                    title="Customize QR style"
+                    style={{ color: qr.custom_style ? "#7c3aed" : undefined }}
+                  >
+                    <Sparkles className={`w-4 h-4 ${qr.custom_style ? "text-violet-500" : "text-slate-400 hover:text-violet-500"}`} />
                   </button>
                   <button
                     onClick={() => { setEditQR(qr); setEditForm({ label: qr.label, target_url: qr.target_url }); }}
@@ -340,6 +357,14 @@ export default function EventDetailPage() {
           </div>
         </form>
       </Modal>
+
+      {/* Customize QR Modal */}
+      <CustomizeQRModal
+        qr={customizeQR}
+        eventId={id}
+        onClose={() => setCustomizeQR(null)}
+        onSaved={fetchData}
+      />
 
       {/* Edit Event Modal */}
       <Modal open={editEvent} onClose={() => setEditEvent(false)} title="Edit Event">

@@ -1,5 +1,6 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from app.config import settings
+from app.storage import ensure_bucket
 
 client: AsyncIOMotorClient = None
 db = None
@@ -19,6 +20,8 @@ async def connect_db():
     await db.scan_logs.create_index("scanned_at")
     await db.events.create_index("owner_id")
     print("Connected to MongoDB and indexes created.")
+    await ensure_bucket()
+    print(f"MinIO bucket '{settings.minio_bucket}' ready.")
     await _seed_admin()
 
 

@@ -125,10 +125,13 @@ async def cb_download(update: Update, context: ContextTypes.DEFAULT_TYPE, qr_id:
     except APIError as e:
         await update.effective_chat.send_message(f"❌ {e}")
         return
+    is_gif = img_bytes[:3] == b"GIF"
+    ext = "gif" if is_gif else "png"
+    caption = "📥 Here is your QR code!" + (" (animated GIF — send as a file to keep animation)" if is_gif else "")
     await update.effective_chat.send_document(
         document=io.BytesIO(img_bytes),
-        filename=f"qr_{qr_id}.png",
-        caption="📥 Here is your QR code PNG!",
+        filename=f"qr_{qr_id}.{ext}",
+        caption=caption,
     )
 
 

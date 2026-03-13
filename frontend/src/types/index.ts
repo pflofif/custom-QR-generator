@@ -43,6 +43,16 @@ export interface EventUpdatePayload {
 
 // ─── QR Code ──────────────────────────────────────────────────────────────────
 
+export interface QRCustomStyle {
+  colorized: boolean;
+  contrast: number;
+  brightness: number;
+  version: number;
+  level: "L" | "M" | "Q" | "H";
+  has_background: boolean;
+  background_key: string | null;
+}
+
 export interface QRCode {
   id: string;
   short_id: string;
@@ -55,6 +65,7 @@ export interface QRCode {
   created_at: string;
   updated_at: string;
   scan_count: number;
+  custom_style: QRCustomStyle | null;
 }
 
 export interface QRCreatePayload {

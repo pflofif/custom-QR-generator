@@ -10,6 +10,13 @@ class Settings(BaseSettings):
     base_url: str = "http://localhost:8000"
     frontend_url: str = "http://localhost:3000"
 
+    # MinIO / S3-compatible object storage
+    minio_endpoint: str = "localhost:9000"
+    minio_access_key: str = "minioadmin"
+    minio_secret_key: str = "minioadmin123"
+    minio_bucket: str = "qr-backgrounds"
+    minio_use_ssl: bool = False
+
     class Config:
         env_file = ".env"
 
